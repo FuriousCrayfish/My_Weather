@@ -1,11 +1,10 @@
-package view
+package com.example.myweather.presentation.view.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.myweather.R
 import com.example.myweather.databinding.ActivityMainBinding
-import view.MainFragment
-
+import com.geekbrains.androidkotlinapp.view.MainFragment
 
 class MainActivity : AppCompatActivity() {
 
