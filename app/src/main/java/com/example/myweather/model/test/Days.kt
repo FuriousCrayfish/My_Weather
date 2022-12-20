@@ -1,4 +1,4 @@
-package test
+package com.example.myweather.model.test
 
 enum class Days(dayNo: Int) {
 
