@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.get
 import com.example.myweather.R
 import com.example.myweather.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.Snackbar
@@ -15,25 +16,27 @@ import com.example.myweather.presentation.view.details.DetailsFragment
 import com.example.myweather.presentation.view.main.MainFragmentAdapter
 import com.example.myweather.presentation.viewModel.AppState
 import com.example.myweather.presentation.viewModel.MainViewModel
+import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel : MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel :: class.java)
+    }
+
     private var isDataSetRus: Boolean = true
 
-    private val adapter = MainFragmentAdapter(object : OnItemViewClickListener {
+    private val adapter = MainFragmentAdapter(object : OnItemViewClickListener{
+
         override fun onItemViewClick(weather: Weather) {
-            val fragmentManager = activity?.supportFragmentManager
-
-            if (fragmentManager != null) {
-                val bundle = Bundle()
-
-                bundle.putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
-                fragmentManager.beginTransaction()
-                    .add(R.id.container, DetailsFragment.newInstance(bundle))
+            activity?.supportFragmentManager?.apply {
+                beginTransaction()
+                    .add(R.id.container, DetailsFragment.newInstance(Bundle().apply {
+                        putParcelable(DetailsFragment.BUNDLE_EXTRA, weather)
+                    }))
                     .addToBackStack("")
                     .commitAllowingStateLoss()
             }
@@ -54,7 +57,6 @@ class MainFragment : Fragment() {
 
         binding.mainFragmentRecyclerView.adapter = adapter
         binding.mainFragmentFAB.setOnClickListener { changeWeatherDataSet() }
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.getLiveData().observe(viewLifecycleOwner, Observer {
             renderData(it)
         })
@@ -67,7 +69,7 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
-    private fun changeWeatherDataSet() {
+    private fun changeWeatherDataSet() =
         if (isDataSetRus) {
 
             viewModel.getWeatherFromLocalSourceWorld()
@@ -77,9 +79,7 @@ class MainFragment : Fragment() {
 
             viewModel.getWeatherFromLocalSourceRus()
             binding.mainFragmentFAB.setImageResource(R.drawable.ic_russia)
-        }
-        isDataSetRus = !isDataSetRus
-    }
+        }.also { isDataSetRus = !isDataSetRus }
 
     private fun renderData(appState: AppState) {
 
@@ -96,16 +96,24 @@ class MainFragment : Fragment() {
 
             is AppState.Error -> {
                 binding.mainFragmentLoadingLayout.visibility = View.GONE
-                Snackbar
-                    .make(binding.mainFragmentFAB, getString(R.string.error),
-                        Snackbar.LENGTH_INDEFINITE)
-                    .setAction(getString(R.string.reload)) {
-                        viewModel.getWeatherFromLocalSourceRus()
-                    }
-                    .show()
+                mainFragmentRootView.showSnackBar(
+                    getString(R.string.error),
+                    getString(R.string.reload),
+                    {viewModel.getWeatherFromLocalSourceRus()}
+                )
             }
         }
     }
+
+    private fun View.showSnackBar(
+        text : String,
+        actionText : String,
+        action : (View) -> Unit,
+        length : Int = Snackbar.LENGTH_INDEFINITE
+    ){
+        Snackbar.make(this,text, length).setAction(actionText, action).show()
+    }
+
 
     interface OnItemViewClickListener{
         fun onItemViewClick(weather: Weather)
