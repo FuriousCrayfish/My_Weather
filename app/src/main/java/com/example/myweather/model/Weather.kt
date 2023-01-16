@@ -1,4 +1,5 @@
 package com.example.myweather.model
+
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
@@ -7,13 +8,17 @@ data class Weather(
     val city: City = getDefaultCity(),
     val temperature: Int = 0,
     val feelsLike: Int = -2,
+    val condition: String = "sunny",
+    val icon: String = "bkn_n",
 ) : Parcelable
 
 fun getDefaultCity() = City("Ростов-на-Дону", 47.2357137, 39.701505, "1749")
 
 fun getWorldCities(): List<Weather> = listOf(
-    Weather(City("Лондон", 51.5085300, -0.1257400, "43"),
-        1, 2,),
+    Weather(
+        City("Лондон", 51.5085300, -0.1257400, "43"),
+        1, 2,
+    ),
     Weather(City("Токио", 35.6895000, 139.6917100, "1943"),
         3, 4),
     Weather(City("Париж", 48.8534100, 2.3488000, "52 до н.э."),

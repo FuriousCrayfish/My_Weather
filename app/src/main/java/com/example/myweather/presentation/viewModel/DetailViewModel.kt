@@ -6,68 +6,64 @@ import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.myweather.model.RemoteDataSource
+import com.example.myweather.model.repository.DetailsRepository
+import com.example.myweather.model.repository.DetailsRepositoryImpl
 import com.example.myweather.model.test.FactDTO
 import com.example.myweather.model.test.WeatherDTO
 import com.example.myweather.presentation.view.details.*
+import com.example.myweather.utils.convertDtoToModel
+import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class DetailViewModel : ViewModel() {
+import java.io.IOException
 
-    companion object {
-        const val DETAILS_LOAD_RESULT_EXTRA = "LOAD RESULT"
-        const val DETAILS_INTENT_EMPTY_EXTRA = "INTENT IS EMPTY"
-        const val DETAILS_DATA_EMPTY_EXTRA = "DATA IS EMPTY"
-        const val DETAILS_RESPONSE_EMPTY_EXTRA = "RESPONSE IS EMPTY"
-        const val DETAILS_REQUEST_ERROR_EXTRA = "REQUEST ERROR"
-        const val DETAILS_REQUEST_ERROR_MESSAGE_EXTRA = "REQUEST ERROR MESSAGE"
-        const val DETAILS_URL_MALFORMED_EXTRA = "URL MALFORMED"
-        const val DETAILS_RESPONSE_SUCCESS_EXTRA = "RESPONSE SUCCESS"
-        const val DETAILS_TEMP_EXTRA = "TEMPERATURE"
-        const val DETAILS_FEELS_LIKE_EXTRA = "FEELS LIKE"
-        const val DETAILS_CONDITION_EXTRA = "CONDITION"
-        private const val TEMP_INVALID = -100
-        private const val FEELS_LIKE_INVALID = -100
-    }
+private const val SERVER_ERROR = "Ошибка сервера"
+private const val REQUEST_ERROR = "Ошибка запрса на сервер"
+private const val CORRUPTED_DATA = "Неполные данные"
 
-    private val _weatherLiveData: MutableLiveData<ResultWeather> = MutableLiveData()
-    val weatherLiveData: LiveData<ResultWeather> = _weatherLiveData
+class DetailViewModel(
+    val detailsLiveData: MutableLiveData<AppState> = MutableLiveData(),
+    private val detailsRepositoryImpl: DetailsRepository = DetailsRepositoryImpl(RemoteDataSource()),
+) : ViewModel() {
 
-    init {
+    private val callBack = object : Callback<WeatherDTO> {
+        override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
+            val serverResponse: WeatherDTO? = response.body()
 
-        _weatherLiveData.postValue(ResultWeather.Loading)
+            detailsLiveData.postValue(
+                if (response.isSuccessful && serverResponse != null) {
+                    checkResponse(serverResponse)
+                } else {
+                    AppState.Error(Throwable(SERVER_ERROR))
+                }
+            )
+        }
 
-    }
+        override fun onFailure(call: Call<WeatherDTO>, t: Throwable) {
+            detailsLiveData.postValue(AppState.Error(Throwable(t?.message ?: REQUEST_ERROR)))
+        }
 
-    fun getWeather(): BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (intent?.getStringExtra(DETAILS_LOAD_RESULT_EXTRA)) {
+        private fun checkResponse(serverResponse: WeatherDTO): AppState {
 
-                DETAILS_INTENT_EMPTY_EXTRA,
-                DETAILS_DATA_EMPTY_EXTRA,
-                DETAILS_RESPONSE_EMPTY_EXTRA,
-                DETAILS_REQUEST_ERROR_EXTRA,
-                DETAILS_REQUEST_ERROR_MESSAGE_EXTRA,
-                DETAILS_URL_MALFORMED_EXTRA -> errorHandler()
-                DETAILS_RESPONSE_SUCCESS_EXTRA -> _weatherLiveData.postValue(
-                    ResultWeather.Success(WeatherDTO(
-                        FactDTO(
-                            intent.getIntExtra(
-                                DETAILS_TEMP_EXTRA, TEMP_INVALID
-                            ),
-                            intent.getIntExtra(DETAILS_FEELS_LIKE_EXTRA, FEELS_LIKE_INVALID),
-                            intent.getStringExtra(DETAILS_CONDITION_EXTRA)
-                        )
-                    ))
 
-                )
-                else -> errorHandler()
+            val fact = serverResponse.fact
+
+            return if (fact == null || fact.temp == null || fact.feels_like == null ||
+                fact.condition.isNullOrEmpty()
+            ) {
+                AppState.Error(Throwable(CORRUPTED_DATA))
+            } else {
+                AppState.Success(convertDtoToModel(serverResponse))
             }
+
         }
     }
 
-    private fun errorHandler() {
-
-        _weatherLiveData.postValue(
-            ResultWeather.Error,
-        )
+    fun getWeather(lat: Double, lon: Double) {
+        detailsLiveData.value = AppState.Loading
+        detailsRepositoryImpl.getWeatherDetailsFromServer(lat, lon, callBack)
     }
 }
