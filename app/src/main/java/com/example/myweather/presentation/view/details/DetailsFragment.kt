@@ -1,11 +1,8 @@
 package com.example.myweather.presentation.view.details
 
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,26 +11,18 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import coil.api.load
-import com.example.myweather.BuildConfig
 import com.example.myweather.R
 import com.example.myweather.databinding.FragmentDetailsBinding
+import com.example.myweather.model.City
 
 import com.example.myweather.model.Weather
-import com.example.myweather.model.test.WeatherDTO
-import com.example.myweather.presentation.view.details.DetailsFragment.Companion.BUNDLE_EXTRA
-import com.example.myweather.presentation.viewModel.AppState
+import com.example.myweather.app.AppState
 import com.example.myweather.presentation.viewModel.DetailViewModel
-import com.example.myweather.presentation.viewModel.ResultWeather
 import com.example.myweather.utils.showSnackBar
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details.*
-import okhttp3.*
-import java.io.IOException
 
 
 class DetailsFragment : Fragment(), View.OnClickListener {
@@ -62,6 +51,7 @@ class DetailsFragment : Fragment(), View.OnClickListener {
     ): View {
         _binding = FragmentDetailsBinding.inflate(inflater, container, false)
         return binding.root
+
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -125,14 +115,7 @@ class DetailsFragment : Fragment(), View.OnClickListener {
                 weatherIcon)
         }
 
-        /*Picasso
-            .get()
-            .load("https://freepngimg.com/thumb/city/36421-8-city-picture.png")
-            .into(binding.headerIcon)
-            добавление картинки через Picasso, как на уроке*/
-
         binding.headerIcon.load("https://freepngimg.com/thumb/city/36421-8-city-picture.png")
-        //Добавление картинки через Coil, на мой взглд более удобное, меньше кода
 
     }
 
@@ -177,5 +160,15 @@ class DetailsFragment : Fragment(), View.OnClickListener {
         length: Int = Snackbar.LENGTH_SHORT,
     ) {
         Snackbar.make(this, text, length).setAction(actionText, action).show()
+    }
+
+    private fun saveCity(city: City, weather: Weather){
+
+        viewModel.saveCityToDB(Weather(
+            city,
+            weather.temperature,
+            weather.feelsLike,
+            weather.condition
+        ))
     }
 }

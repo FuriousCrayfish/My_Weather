@@ -2,8 +2,9 @@ package com.example.myweather.presentation.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.myweather.model.Repository
-import com.example.myweather.model.RepositoryImpl
+import com.example.myweather.app.AppState
+import com.example.myweather.model.repository.Repository
+import com.example.myweather.model.repository.RepositoryImpl
 import java.lang.Thread.sleep
 
 class MainViewModel(

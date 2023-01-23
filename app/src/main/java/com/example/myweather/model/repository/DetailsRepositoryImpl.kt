@@ -1,6 +1,4 @@
 package com.example.myweather.model.repository
-
-import com.example.myweather.model.RemoteDataSource
 import com.example.myweather.model.test.WeatherDTO
 
 class DetailsRepositoryImpl(private val remoteDataSource: RemoteDataSource) : DetailsRepository {

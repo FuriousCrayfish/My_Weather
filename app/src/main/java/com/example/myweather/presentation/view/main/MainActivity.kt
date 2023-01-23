@@ -1,23 +1,12 @@
 package com.example.myweather.presentation.view.main
 
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
-import android.view.View
-import androidx.annotation.RequiresApi
+import android.view.Menu
+import android.view.MenuItem
+import com.example.myweather.presentation.view.history.HistoryFragment
 import com.example.myweather.R
 import com.example.myweather.databinding.ActivityMainBinding
-import com.example.myweather.databinding.MainActivityWebviewBinding
-import com.geekbrains.androidkotlinapp.view.MainFragment
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.lang.Exception
-import java.net.MalformedURLException
-import java.net.URL
-import java.util.stream.Collectors
-import javax.net.ssl.HttpsURLConnection
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,5 +22,24 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.getRoot()
         setContentView(view)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_screen_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_history -> {
+                supportFragmentManager.apply {
+                    beginTransaction()
+                        .add(R.id.container, HistoryFragment.newInstance())
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
+                true
+            }else -> super.onOptionsItemSelected(item)
+        }
     }
 }

@@ -9,4 +9,5 @@
     <string name="founded">Город основан в: %s</string>
     <string name="button_info_text">Узнать год основания</string>
     <string name="snackBar_text">Вы молодец!</string>
+    <string name="menu_title_history">history</string>
 </resources>

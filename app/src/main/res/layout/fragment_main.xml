@@ -41,6 +41,3 @@
             android:layout_gravity="center" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!--@dimen/fab_margin
-    @dimen/fab_icon_size-->
