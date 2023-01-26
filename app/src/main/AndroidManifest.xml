@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.myweather" >
+    package="com.example.myweather">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name=".app.App"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -13,21 +15,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyWeather"
-        tools:targetApi="31"
-        android:name=".app.App"
-        >
+        tools:targetApi="31">
+        <provider
+            android:name=".model.repository.EducationContentProvider"
+            android:authorities="@string/authorities"
+            android:enabled="true"
+            android:exported="true"></provider>
+
         <activity
             android:name="com.example.myweather.presentation.view.main.MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-    <!--<service android:name=".presentation.view.details.DetailsService" />-->
-
     </application>
 
 </manifest>

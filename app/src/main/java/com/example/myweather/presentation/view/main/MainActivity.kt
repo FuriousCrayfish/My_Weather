@@ -7,6 +7,7 @@ import android.view.MenuItem
 import com.example.myweather.presentation.view.history.HistoryFragment
 import com.example.myweather.R
 import com.example.myweather.databinding.ActivityMainBinding
+import com.example.myweather.presentation.view.contentProvider.ContentProviderFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,7 +40,17 @@ class MainActivity : AppCompatActivity() {
                         .commitAllowingStateLoss()
                 }
                 true
-            }else -> super.onOptionsItemSelected(item)
+            }
+            R.id.menu_content_provider -> {
+                supportFragmentManager.apply {
+                    beginTransaction()
+                        .add(R.id.container, ContentProviderFragment.newInstance())
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

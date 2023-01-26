@@ -23,7 +23,7 @@ class HistoryFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
         return binding.root
@@ -39,8 +39,11 @@ class HistoryFragment : Fragment() {
     private fun renderData(appState: AppState) {
         when (appState) {
             is AppState.Success -> {
-                binding.historyFragmentRecyclerview.visibility = View.VISIBLE
-                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+                with(binding) {
+                    binding.historyFragmentRecyclerview.visibility = View.VISIBLE
+                    binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+                }
+
                 adapter.setData(appState.weatherData)
             }
             is AppState.Loading -> {

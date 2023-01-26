@@ -10,4 +10,7 @@
     <string name="button_info_text">Узнать год основания</string>
     <string name="snackBar_text">Вы молодец!</string>
     <string name="menu_title_history">history</string>
+    <string name="menu_threads_title">Threads</string>
+    <string name="content_provider">Content provider</string>
+    <string name="authorities">com.example.myweather.provider</string>
 </resources>
