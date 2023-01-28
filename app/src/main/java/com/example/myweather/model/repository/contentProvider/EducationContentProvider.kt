@@ -1,4 +1,4 @@
-package com.example.myweather.model.repository
+package com.example.myweather.model.repository.contentProvider
 
 import android.content.ContentProvider
 import android.content.ContentUris
