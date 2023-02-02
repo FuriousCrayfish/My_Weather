@@ -18,14 +18,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyWeather"
         tools:targetApi="31">
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+
+        </service>
+
         <provider
             android:name=".model.repository.contentProvider.EducationContentProvider"
             android:authorities="@string/authorities"
             android:enabled="true"
-            android:exported="true"></provider>
+            android:exported="true" />
 
         <activity
-            android:name="com.example.myweather.presentation.view.main.MainActivity"
+            android:name=".presentation.view.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
